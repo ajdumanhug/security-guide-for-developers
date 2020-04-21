@@ -4,28 +4,30 @@
 ### The Security Checklist 
 
 ##### AUTHENTICATION SYSTEMS (Signup/Signin/2 Factor/Password reset) 
-- [ ] Use HTTPS everywhere.
-- [ ] Store password hashes using `Bcrypt` (no salt necessary - `Bcrypt` does it for you).
-- [ ] Destroy the session identifier after `logout`.  
-- [ ] Destroy all active sessions on reset password (or offer to).  
+- [ ] Force the server to serve HTTPS when the access HTTP.
+- [ ] Always store the password in encrypted format and not in plaintext.
+- [ ] Destroy or terminate the session upon logout.
+- [ ] Destroy all active sessions on reset password
 - [ ] Must have the `state` parameter in OAuth2.
-- [ ] No open redirects after successful login or in any other intermediate redirects.
-- [ ] When parsing Signup/Login input, sanitize for javascript://, data://, CRLF characters. 
-- [ ] Set secure, httpOnly cookies.
-- [ ] In Mobile `OTP` based mobile verification, do not send the OTP back in the response when `generate OTP` or `Resend OTP`  API is called.
-- [ ] Limit attempts to `Login`, `Verify OTP`, `Resend OTP` and `generate OTP` APIs for a particular user. Have an exponential backoff set or/and something like a captcha based challenge.
+- [ ] No open redirects upon successful login. (Hackers can use these attacks: Unvalidated Redirect and Forward)
+- [ ] Set cookie with httpOnly and secure flag set.
+- [ ] When generating OTP or calling Resend OTP API, do not send the OTP back in the response to avoid account takeover.
+- [ ] Limit attempts in Login, Verify OTP, Resend OTP, Generate OTP, Change Password, or other related critical functions for a particular user. Have an exponential backoff set or/and something like a captcha based challenge.
 - [ ] Check for randomness of reset password token in the emailed link or SMS.
-- [ ] Set an expiration on the reset password token for a reasonable period.
-- [ ] Expire the reset token after it has been successfully used.
+- [ ] Make sure that the reset password token is random and unguessable.
+- [ ] Set an expiration on the reset password token for a reasonable period. 24 hours is enough.
+- [ ] Destroy the reset token upon successful usage.
+- [ ] Implement strong password required in Registration, Change Password, Reset Password.
+- [ ] Always add autocomplete=”off” attribute in the critical fields.
+- [ ] Have a block list of usernames (check the list [here](https://github.com/marteinn/The-Big-Username-Blacklist) and add internal routes)
 
 
 ##### USER DATA & AUTHORIZATION
-- [ ] Any resource access like, `my cart`, `my history` should check the logged in user's ownership of the resource using session id.
-- [ ] Serially iterable resource id should be avoided. Use `/me/orders` instead of `/user/37153/orders`. This acts as a sanity check in case you forgot to check for authorization token. 
-- [ ] `Edit email/phone number` feature should be accompanied by a verification email to the owner of the account. 
-- [ ] Any upload feature should sanitize the filename provided by the user. Also, for generally reasons apart from security, upload to something like S3 (and post-process using lambda) and not your own server capable of executing code.  
-- [ ] `Profile photo upload` feature should sanitize all the `EXIF` tags also if not required.
-- [ ] For user ids and other ids, use [RFC compliant ](http://www.ietf.org/rfc/rfc4122.txt) `UUID` instead of integers. You can find an implementation for this for your language on Github.
+- [ ] Serially iterable resource id should be avoided. Use /me/orders instead of /user/31337/orders. (You may use this approach as long as you have the proper authorization validation)
+- [ ] Edit email address/phone number feature should be accompanied by a verification email to the owner of the account.
+- [ ] During signup, email or mobile verification must be required to prevent users from signing up using other users’ email and mobile number.
+- [ ] Photo upload feature should sanitize all the metadata including EXIF tags
+- [ ] For user ids and other ids, use [RFC compliant ](http://www.ietf.org/rfc/rfc4122.txt) `UUID` instead of integers.
 - [ ] JWT are awesome. Use them if required for your single page app/APIs.
 
 
@@ -78,5 +80,4 @@
 - [ ] Depending on what you are making, limit access to your user databases.
 - [ ] Be polite to bug reporters.
 - [ ] Have your code review done by a fellow developer from a secure coding perspective. (More eyes)
-- [ ] In case of a hack or data breach, check previous logs for data access, ask people to change passwords. You might require an audit by external agencies depending on where you are incorporated.  
-- [ ] Set up [Netflix's Scumblr](https://github.com/Netflix/Scumblr) to hear about talks about your organization on social platforms and Google search.
+- [ ] In case of a hack or data breach, check previous logs for data access, ask people to change passwords. You might require an audit by external agencies depending on where you are incorporated.
